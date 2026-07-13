@@ -4,24 +4,26 @@ export const ROLES = {
 };
 
 export const COMPLAINT_STATUS = {
-  OPEN: "Open",
-  IN_PROGRESS: "In Progress",
-  RESOLVED: "Resolved",
+  OPEN: "open",
+  IN_PROGRESS: "in-progress",
+  RESOLVED: "resolved",
 };
 
 export const PRIORITY = {
-  LOW: "Low",
-  MEDIUM: "Medium",
-  HIGH: "High",
+  LOW: "low",
+  MEDIUM: "medium",
+  HIGH: "high",
 };
 
 export const CATEGORIES = [
-  "Electrical",
-  "Water",
-  "Parking",
-  "Cleaning",
-  "Security",
-  "Lift",
-  "Garden",
-  "Other",
+  "water",
+  "electricity",
+  "sanitation",
+  "security",
+  "parking",
+  "lift",
+  "other",
 ];
+
+// Configurable overdue threshold (in days)
+export const OVERDUE_THRESHOLD_DAYS = 7;
