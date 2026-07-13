@@ -1,4 +1,6 @@
-import mongoose from 'mongoose'
+import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 const User = new mongoose.Schema({
     name : {
@@ -7,7 +9,8 @@ const User = new mongoose.Schema({
     },
     email : {
         type : String,
-        required : true
+        required : true,
+        unique: true
     },
     phone : {
         type : String,
@@ -23,8 +26,33 @@ const User = new mongoose.Schema({
     role : {
         type : String,
         default : 'resident',
-        required : true
+        required : true,
+        enum: ['resident', 'admin']
     }
-})
+}, { timestamps: true });
 
-export default mongoose.model('User', User)
+User.pre('save', async function (next) {
+    if (!this.isModified("password")) return next();
+    this.password = await bcrypt.hash(this.password, 10);
+    next();
+});
+
+User.methods.isPasswordCorrect = async function (password) {
+    return await bcrypt.compare(password, this.password);
+};
+
+User.methods.generateAccessToken = function () {
+    return jwt.sign(
+        {
+            _id: this._id,
+            email: this.email,
+            role: this.role
+        },
+        process.env.ACCESS_TOKEN_SECRET || 'secret123',
+        {
+            expiresIn: process.env.ACCESS_TOKEN_EXPIRY || '1d'
+        }
+    );
+};
+
+export default mongoose.model('User', User);

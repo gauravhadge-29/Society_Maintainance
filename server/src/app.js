@@ -1,6 +1,10 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import authRouter from "./routes/auth.routes.js";
+import complaintRouter from "./routes/complaint.routes.js";
+import adminRouter from "./routes/admin.routes.js";
+import noticeRouter from "./routes/notice.routes.js";
 
 const app = express();
 
@@ -14,5 +18,11 @@ app.use(
     credentials: true,
   })
 );
+
+// routes declaration
+app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/complaints", complaintRouter);
+app.use("/api/v1/admin", adminRouter);
+app.use("/api/v1/notices", noticeRouter);
 
 export default app;
