@@ -7,10 +7,10 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { COMPLAINT_STATUS } from "../utils/constants.js";
 
 const createComplaint = asyncHandler(async (req, res) => {
-    const { title, description, category, priority } = req.body;
+    const { title, description, category } = req.body;
 
-    if (!title || !description || !category || !priority) {
-        throw new ApiError(400, "All fields (title, description, category, priority) are required");
+    if (!title || !description || !category) {
+        throw new ApiError(400, "All fields (title, description, category) are required");
     }
 
     const photoUrls = [];
@@ -29,7 +29,6 @@ const createComplaint = asyncHandler(async (req, res) => {
         title,
         description,
         category,
-        priority,
         userId: req.user._id,
         flatNo: req.user.flatNo || "N/A",
         photo: photoUrls,

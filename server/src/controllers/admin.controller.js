@@ -38,13 +38,19 @@ const updateOverdueComplaints = async () => {
 const getAllComplaints = asyncHandler(async (req, res) => {
     await updateOverdueComplaints();
 
-    const { status, category, priority, isOverdue } = req.query;
+    const { status, category, priority, isOverdue, startDate, endDate } = req.query;
     const filter = {};
 
     if (status) filter.status = status;
     if (category) filter.category = category;
     if (priority) filter.priority = priority;
     if (isOverdue !== undefined) filter.isOverdue = isOverdue === 'true';
+    
+    if (startDate || endDate) {
+        filter.createdAt = {};
+        if (startDate) filter.createdAt.$gte = new Date(startDate);
+        if (endDate) filter.createdAt.$lte = new Date(endDate);
+    }
 
     const complaints = await Complaint.find(filter)
         .populate("userId", "name email flatNo")

@@ -25,15 +25,7 @@ const Notice = new mongoose.Schema({
     photo: {
         type: String,
         default: null
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
-    updatedAt: {
-        type: Date,
-        default: Date.now
     }
-})
+}, { timestamps: true })
 
 export default mongoose.model('Notice', Notice)

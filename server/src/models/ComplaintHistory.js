@@ -27,16 +27,8 @@ const ComplaintHistory = new mongoose.Schema({
     resolvedAt: {
         type: Date,
         default: null
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
-    updatedAt: {
-        type: Date,
-        default: Date.now
     }
-})
+}, { timestamps: true })
 
 export default mongoose.model('ComplaintHistory', ComplaintHistory)
 

@@ -28,7 +28,7 @@ const Complaint = new mongoose.Schema({
     priority : {
         type : String,
         enum : Object.values(PRIORITY),
-        required : true
+        default : PRIORITY.LOW
     },
     status : {
         type : String,
@@ -42,15 +42,7 @@ const Complaint = new mongoose.Schema({
     flatNo : {
         type : String,
         required : true
-    },
-    createdAt : {
-        type : Date,
-        default : Date.now
-    },
-    updatedAt : {
-        type : Date,
-        default : Date.now
     }
-})
+}, { timestamps: true })
 
 export default mongoose.model('Complaint', Complaint)
