@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createComplaint, getUserComplaints } from "../controllers/complaint.controller.js";
+import { createComplaint, getUserComplaints, getComplaintById } from "../controllers/complaint.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import upload from "../config/multer.js";
 
@@ -10,5 +10,7 @@ router.use(verifyJWT); // Protect all routes in this file
 router.route("/")
     .post(upload.array("photo", 5), createComplaint) // Accept up to 5 photos
     .get(getUserComplaints);
+
+router.route("/:id").get(getComplaintById);
 
 export default router;

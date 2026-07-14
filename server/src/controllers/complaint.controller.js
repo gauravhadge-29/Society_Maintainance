@@ -73,7 +73,32 @@ const getUserComplaints = asyncHandler(async (req, res) => {
     );
 });
 
+const getComplaintById = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+
+    const complaint = await Complaint.findById(id).lean();
+
+    if (!complaint) {
+        throw new ApiError(404, "Complaint not found");
+    }
+
+    // Admins can view any complaint, residents can only view their own
+    if (req.user.role !== "admin" && complaint.userId.toString() !== req.user._id.toString()) {
+        throw new ApiError(403, "You do not have permission to view this complaint");
+    }
+
+    const history = await ComplaintHistory.find({ complaintId: id })
+        .populate("changedBy", "name role")
+        .sort({ createdAt: -1 })
+        .lean();
+
+    return res.status(200).json(
+        new ApiResponse(200, "Complaint details fetched successfully", { ...complaint, history })
+    );
+});
+
 export {
     createComplaint,
-    getUserComplaints
+    getUserComplaints,
+    getComplaintById
 };

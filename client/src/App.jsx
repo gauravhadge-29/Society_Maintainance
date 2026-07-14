@@ -1,5 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 
 // Auth Pages
 import Login from './pages/auth/Login';
@@ -12,6 +14,7 @@ import CreateComplaint from './pages/resident/CreateComplaint';
 // Admin Pages
 import AdminDashboard from './pages/admin/AdminDashboard';
 import CreateNotice from './pages/admin/CreateNotice';
+import AdminComplaints from './pages/admin/AdminComplaints';
 
 // Shared Pages
 import NoticeBoard from './pages/shared/NoticeBoard';
@@ -20,27 +23,32 @@ import ComplaintDetail from './pages/shared/ComplaintDetail';
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        {/* Auth Routes */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+      <AuthProvider>
+        <Routes>
+          {/* Auth Routes */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
 
-        {/* Resident Routes */}
-        <Route path="/resident/dashboard" element={<ResidentDashboard />} />
-        <Route path="/resident/complaints/new" element={<CreateComplaint />} />
+          {/* Protected Routes - Residents Only */}
+          <Route element={<ProtectedRoute allowedRoles={['resident', 'admin']} />}>
+            <Route path="/resident/dashboard" element={<ResidentDashboard />} />
+            <Route path="/resident/complaints/new" element={<CreateComplaint />} />
+            <Route path="/complaints/:id" element={<ComplaintDetail />} />
+            <Route path="/notices" element={<NoticeBoard />} />
+          </Route>
 
-        {/* Admin Routes */}
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path="/admin/notices/new" element={<CreateNotice />} />
+          {/* Protected Routes - Admins Only */}
+          <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/complaints" element={<AdminComplaints />} />
+            <Route path="/admin/notices/new" element={<CreateNotice />} />
+          </Route>
 
-        {/* Shared Routes */}
-        <Route path="/notices" element={<NoticeBoard />} />
-        <Route path="/complaints/:id" element={<ComplaintDetail />} />
-
-        {/* Default Redirects */}
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route path="*" element={<Navigate to="/login" replace />} />
-      </Routes>
+          {/* Default Redirects */}
+          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

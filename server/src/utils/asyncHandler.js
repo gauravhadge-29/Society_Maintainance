@@ -3,12 +3,21 @@ const asyncHandler = (fn) => {
         try {
             await fn(req, res, next)
         } catch (error) {
-            res.status(500).json({
+            const statusCode = error.statusCode || 500;
+            
+            // Log the error to the backend console for debugging
+            console.error("❌ [Backend Error]:", error);
+
+            res.status(statusCode).json({
+                statusCode,
                 success: false,
-                message: error.message
-            })
+                message: error.message || "Internal Server Error",
+                errors: error.error || [],
+                stack: process.env.NODE_ENV === "development" ? error.stack : undefined
+            });
         }
     }
 }
 
 export default asyncHandler
+
