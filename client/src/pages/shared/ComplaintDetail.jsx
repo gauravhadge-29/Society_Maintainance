@@ -18,6 +18,7 @@ export default function ComplaintDetail() {
 
   // Admin update states
   const [updateStatus, setUpdateStatus] = useState('');
+  const [updatePriority, setUpdatePriority] = useState('low');
   const [updateRemark, setUpdateRemark] = useState('');
   const [updating, setUpdating] = useState(false);
   const [updateSuccess, setUpdateSuccess] = useState(false);
@@ -27,6 +28,7 @@ export default function ComplaintDetail() {
       const response = await api.get(`/complaints/${id}`);
       setComplaint(response.data.data);
       setUpdateStatus(response.data.data.status);
+      setUpdatePriority(response.data.data.priority || 'low');
     } catch (err) {
       setError(err.response?.data?.message || 'Error fetching complaint details');
     } finally {
@@ -46,6 +48,7 @@ export default function ComplaintDetail() {
     try {
       await api.patch(`/admin/complaints/${id}`, {
         status: updateStatus,
+        priority: updatePriority,
         remark: updateRemark
       });
       setUpdateRemark('');
@@ -111,6 +114,7 @@ export default function ComplaintDetail() {
               <div>
                 <div className="flex flex-wrap items-center gap-2 mb-2">
                   <span className="text-[11px] font-semibold text-primary-600 bg-primary-50 px-2 py-0.5 rounded-md uppercase">{complaint.category}</span>
+                  <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-md uppercase border ${complaint.priority === 'high' ? 'text-red-700 bg-red-50 border-red-200' : complaint.priority === 'medium' ? 'text-amber-700 bg-amber-50 border-amber-200' : 'text-slate-700 bg-slate-50 border-slate-200'}`}>{complaint.priority} Priority</span>
                   <span className="text-xs text-slate-400">Submitted {new Date(complaint.createdAt).toLocaleDateString()}</span>
                 </div>
                 <h1 className="text-xl font-bold text-slate-900">{complaint.title}</h1>
@@ -158,10 +162,16 @@ export default function ComplaintDetail() {
 
             <form onSubmit={handleUpdate} className="flex flex-col sm:flex-row gap-3">
               <select value={updateStatus} onChange={(e) => setUpdateStatus(e.target.value)}
-                className="flex-1 px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500">
+                className="flex-[0.8] px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500">
                 <option value="open">Open</option>
                 <option value="in-progress">In Progress</option>
                 <option value="resolved">Resolved</option>
+              </select>
+              <select value={updatePriority} onChange={(e) => setUpdatePriority(e.target.value)}
+                className="flex-[0.8] px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500">
+                <option value="low">Low Priority</option>
+                <option value="medium">Medium Priority</option>
+                <option value="high">High Priority</option>
               </select>
               <input type="text" value={updateRemark} onChange={(e) => setUpdateRemark(e.target.value)} placeholder="Add a remark..."
                 className="flex-[2] px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-sm placeholder:text-slate-400 transition-all focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" />

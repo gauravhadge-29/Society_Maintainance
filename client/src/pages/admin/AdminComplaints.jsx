@@ -17,6 +17,8 @@ export default function AdminComplaints() {
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [dateFilter, setDateFilter] = useState('all');
 
   useEffect(() => {
     const fetchComplaints = async () => {
@@ -33,9 +35,29 @@ export default function AdminComplaints() {
   }, []);
 
   const filteredComplaints = complaints.filter(c => {
-    if (filter === 'all') return true;
-    if (filter === 'overdue') return c.isOverdue && c.status !== 'resolved';
-    return c.status === filter;
+    // Status Filter
+    let statusMatch = true;
+    if (filter === 'overdue') {
+      statusMatch = c.isOverdue && c.status !== 'resolved';
+    } else if (filter !== 'all') {
+      statusMatch = c.status === filter;
+    }
+
+    // Category Filter
+    let categoryMatch = categoryFilter === 'all' || c.category === categoryFilter;
+
+    // Date Filter
+    let dateMatch = true;
+    if (dateFilter !== 'all') {
+      const date = new Date(c.createdAt);
+      const now = new Date();
+      const diffTime = Math.abs(now - date);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      if (dateFilter === '7days') dateMatch = diffDays <= 7;
+      if (dateFilter === '30days') dateMatch = diffDays <= 30;
+    }
+
+    return statusMatch && categoryMatch && dateMatch;
   });
 
   return (
@@ -52,21 +74,40 @@ export default function AdminComplaints() {
               <p className="text-sm text-slate-500 mt-0.5">Manage and track all resident issues</p>
             </div>
 
-            {/* Filter tabs */}
-            <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-lg">
-              {FILTER_OPTIONS.map(opt => (
-                <button
-                  key={opt.value}
-                  onClick={() => setFilter(opt.value)}
-                  className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-200 ${
-                    filter === opt.value
-                      ? 'bg-white text-slate-900 shadow-sm'
-                      : 'text-slate-500 hover:text-slate-700'
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              ))}
+            {/* Filters */}
+            <div className="flex flex-col sm:flex-row items-center gap-3">
+              <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-lg">
+                {FILTER_OPTIONS.map(opt => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setFilter(opt.value)}
+                    className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-200 ${
+                      filter === opt.value
+                        ? 'bg-white text-slate-900 shadow-sm'
+                        : 'text-slate-500 hover:text-slate-700'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+              <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}
+                className="px-3 py-1.5 bg-slate-100 border-none rounded-lg text-xs font-medium text-slate-700 focus:ring-2 focus:ring-primary-500/20 outline-none">
+                <option value="all">All Categories</option>
+                <option value="water">Water</option>
+                <option value="electricity">Electricity</option>
+                <option value="sanitation">Sanitation</option>
+                <option value="security">Security</option>
+                <option value="parking">Parking</option>
+                <option value="lift">Lift</option>
+                <option value="other">Other</option>
+              </select>
+              <select value={dateFilter} onChange={(e) => setDateFilter(e.target.value)}
+                className="px-3 py-1.5 bg-slate-100 border-none rounded-lg text-xs font-medium text-slate-700 focus:ring-2 focus:ring-primary-500/20 outline-none">
+                <option value="all">Any Date</option>
+                <option value="7days">Last 7 Days</option>
+                <option value="30days">Last 30 Days</option>
+              </select>
             </div>
           </div>
 
@@ -100,6 +141,9 @@ export default function AdminComplaints() {
                         </p>
                       </div>
                       <div className="flex items-center gap-3 flex-shrink-0">
+                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded border uppercase hidden sm:inline-flex ${c.priority === 'high' ? 'text-red-700 bg-red-50 border-red-200' : c.priority === 'medium' ? 'text-amber-700 bg-amber-50 border-amber-200' : 'text-slate-700 bg-slate-50 border-slate-200'}`}>
+                          {c.priority}
+                        </span>
                         <span className="text-[11px] font-medium text-slate-500 bg-slate-50 px-2 py-0.5 rounded-md uppercase hidden sm:inline-flex">{c.category}</span>
                         <StatusBadge status={c.status} />
                         <svg className="w-4 h-4 text-slate-300 group-hover:text-primary-400 transition-colors" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
