@@ -2,6 +2,10 @@
 
 A comprehensive platform for apartment societies where residents can raise and track complaints, and admins can manage the workflows efficiently. 
 
+## Live Demo
+- **Frontend URL:** [https://society-maintainance-1.onrender.com]
+- **Backend API URL:** [https://society-maintainance.onrender.com]
+
 ## Setup Guide
 
 ### Prerequisites
@@ -58,6 +62,30 @@ Start Frontend:
 cd client
 npm run dev
 ```
+
+---
+
+## Deployment Guide
+
+### Deploying the Backend (Render)
+1. Log in to Render and create a new **Web Service**.
+2. Connect your GitHub repository.
+3. Configure the build settings:
+   - **Root Directory:** `server`
+   - **Build Command:** `npm install`
+   - **Start Command:** `npm start`
+4. Add all environment variables from `server/.env.example` in the Render Environment tab.
+   - For `FRONTEND_URL`, enter the URL where your frontend will be hosted (e.g., `https://your-frontend.vercel.app`).
+5. Deploy the Web Service and copy the provided backend URL (e.g., `https://society-maintenance.onrender.com`).
+
+### Deploying the Frontend (Vercel / Netlify / Render)
+1. Create a new project on your hosting platform and connect your repository.
+2. Configure the build settings:
+   - **Root Directory:** `client`
+   - **Framework Preset:** Vite or React
+3. In the Environment Variables section, add:
+   - `VITE_API_URL=https://society-maintenance.onrender.com/api/v1` *(Replace with your actual backend URL from the step above)*
+4. Deploy the site.
 
 ---
 
